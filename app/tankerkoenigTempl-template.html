@@ -1,0 +1,9 @@
+<script id="tankerkoenig-template" type="text/template">
+    <li data-bind="attr: { id: id }" class="sortable no-header">
+        <div>
+            <label class="device-label" data-bind="text: name, tooltip: $data.labelTooltipHtml" />
+        </div>
+
+        <div data-bind="attr: { id: id + '_tankerkoenig_placeholder'}">&nbsp;</div>
+    </li>
+</script>

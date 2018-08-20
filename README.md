@@ -9,9 +9,10 @@ This plugin provides actual price information for the gas station(s) of your cho
 
 
 # Configuration
-There are only two configuration parameters
-* ids - The ids of your gas station(s) separated by semicolon (;)
+There are three two configuration parameters
+* ids - The ids of your gas station(s) separated by comma (,)
 * interval - refresh interval in minutes (minimum is 5 minutes due to license regulation)
+* type - Which type do you want to see (e5 | e10 | diesel | all) separated by comma (,)
 
 
 ### Sample Device Config:
@@ -20,8 +21,9 @@ There are only two configuration parameters
       "id": "prices",
       "name": "prices",
       "class": "TankerkoenigDevice",
-      "ids": "474e5046-deaf-4f9b-9a32-9797b778f047;4429a7d9-fb2d-4c29-8cfe-2ca90323f9f8;278130b1-e062-4a0f-80cc-19e486b4c024",
-      "interval": "10"
+      "ids": "474e5046-deaf-4f9b-9a32-9797b778f047,4429a7d9-fb2d-4c29-8cfe-2ca90323f9f8,278130b1-e062-4a0f-80cc-19e486b4c024",
+      "interval": "10",
+      "type": "all"
     },
 ```
 

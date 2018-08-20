@@ -1,0 +1,32 @@
+{ "name": "pimatic-tankerkoenig",
+  "description": "Tankerkoenig plugin",
+  "author": "Paul Schmidt",
+  "license": "MIT",
+  "main": "tankerkoenig",
+  "files": [
+    "tankerkoenig.coffee",
+    "README.md",
+    "tankerkoenig-config-schema.coffee",
+	"device-config-schema.coffee",
+    "app"
+  ],
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/saxn-paule/pimatic-tankerkoenig.git"
+  },
+  "bugs": {
+    "url": "https://github.com/saxn-paule/pimatic-tankerkoenig/issues"
+  },
+  "configSchema": "tankerkoenig-config-schema.coffee",
+  "dependencies": {
+    "request": "2.83.0"
+  },
+  "peerDependencies": {
+    "pimatic": "0.9.*"
+  },
+  "engines": {
+    "node": ">0.8.x",
+    "npm": ">1.1.x"
+  }
+}

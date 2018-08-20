@@ -1,0 +1,41 @@
+/*Custom CSS*/
+.tankerkoenig {
+	width: 100%;
+	margin-top: 10px;
+}
+
+.tankerkoenig .caption {
+	border-bottom: 3px solid white;
+	white-space: normal;
+}
+
+.tankerkoenig .table {
+	float: left;
+	width: 100%;
+	margin-bottom: 10px;
+}
+
+.tankerkoenig .col-1, .tankerkoenig .col-2 {
+ 	float:left;
+	padding-left: 5px;
+	height: auto;
+}
+
+.tankerkoenig .row {
+	padding-left: 5px;
+}
+
+.tankerkoenig .col-1 {
+	width: 30%;
+	border-bottom: 2px solid #CCCCCC;
+}
+
+.tankerkoenig .col-2 {
+	width: 60%;
+	white-space: normal;
+	border-bottom: 2px solid #CCCCCC;
+}
+
+.clear {
+	clear: both;
+}
