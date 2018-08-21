@@ -4,6 +4,10 @@
 	margin-top: 10px;
 }
 
+.tankerkoenig .last_update {
+	margin-bottom: 10px;
+}
+
 .tankerkoenig .caption {
 	border-bottom: 3px solid white;
 	white-space: normal;

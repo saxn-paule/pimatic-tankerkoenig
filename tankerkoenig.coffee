@@ -174,6 +174,9 @@ module.exports = (env) ->
 
         placeholderContent = "<div class=\"tankerkoenig\">"
 
+        updateDate = new Date()
+        placeholderContent = placeholderContent + "<div class='last_update'>Stand: " + updateDate.getHours() + ":" + updateDate.getMinutes() + " Uhr</div>"
+
         if data? and data.prices?
           prices = data.prices
 
