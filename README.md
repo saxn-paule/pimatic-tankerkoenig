@@ -9,7 +9,7 @@ This plugin provides actual price information for the gas station(s) of your cho
 
 
 # Configuration
-There are three two configuration parameters
+There are three configuration parameters
 * ids - The ids of your gas station(s) separated by comma (,)
 * interval - refresh interval in minutes (minimum is 5 minutes due to license regulation)
 * type - Which type do you want to see (e5 | e10 | diesel | all) separated by comma (,)

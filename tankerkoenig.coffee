@@ -1,10 +1,9 @@
 module.exports = (env) ->
 
   Promise = env.require 'bluebird'
-  assert = env.require 'cassert'
-  M = env.matcher
   t = env.require('decl-api').types
   Request = require 'request'
+
   api = "https://creativecommons.tankerkoenig.de/json/prices.php?ids={idPlaceholder}&apikey={apiKeyPlaceholder}"
   detailApi = "https://creativecommons.tankerkoenig.de/json/detail.php?id={idPlaceholder}&apikey={apiKeyPlaceholder}"
 
@@ -18,9 +17,11 @@ module.exports = (env) ->
     init: (app, @framework, @config) =>
 
       deviceConfigDef = require("./device-config-schema")
+
       @framework.deviceManager.registerDeviceClass("TankerkoenigDevice",{
+        prepareConfig: TankerkoenigDevice.prepareConfig,
         configDef : deviceConfigDef.TankerkoenigDevice,
-        createCallback : (config) => new TankerkoenigDevice(config,this)
+        createCallback : (config, lastState) => new TankerkoenigDevice(config, lastState, this)
       })
 
       @framework.on "after init", =>
@@ -33,14 +34,57 @@ module.exports = (env) ->
         return
 
   class TankerkoenigDevice extends env.devices.Device
-    template: 'tankerkoenig'
-
     attributes:
       prices:
         description: 'the prices data'
         type: t.string
+      e5Min:
+        description: 'the cheapest e5 price'
+        type: t.number
+      e10Min:
+        description: 'the cheapest e10 price'
+        type: t.number
+      dieselMin:
+        description: 'the cheapest diesel price'
+        type: t.number
 
-    constructor: (@config, @plugin) ->
+    template: 'tankerkoenig'
+
+    ###
+    @prepareConfig: (config) =>
+      numericAttributes = ['e5Min', 'e10Min', 'dieselMin']
+
+      if config.xAttributeOptions?
+        xAttributeOptions = config.xAttributeOptions
+      else
+        xAttributeOptions = []
+
+      keys = []
+      for i in xAttributeOptions
+        keys.push(i.name)
+
+      # set displaySparkline to false initially
+      for attr in numericAttributes
+        if attr not in keys
+          xAttributeOptions.push(
+            {
+              name: attr,
+              displaySparkline: false
+            }
+          )
+
+      config.xAttributeOptions = xAttributeOptions
+    ###
+
+    constructor: (@config, @plugin, lastState) ->
+      # create getter function for attributes
+
+      for attributeName of @attributes
+        do (attributeName) =>
+          @_createGetter(attributeName, =>
+            @initialized.then => Promise.resolve @[attributeName]
+          )
+
       @id = @config.id
       @name = @config.name
       @apiKey = @config.apiKey
@@ -49,18 +93,29 @@ module.exports = (env) ->
       @type = @config.type or "all"
       @prices = ""
 
+      @e5_min = lastState?["e5_min"]?.value or -1
+      @e10_min = lastState?["e10_min"]?.value or -1
+      @diesel_min = lastState?["diesel_min"]?.value or -1
+
       if @interval < 5
         reloadInterval = 300000
       else
         reloadInterval = @interval * 60000
 
-      @retrieveStationNames()
+      @initialized = new Promise (resolve) =>
+        @retrieveStationNames()
+        resolve()
 
       @timerId = setInterval ( =>
         @reloadPrices()
       ), reloadInterval
 
       super()
+
+
+    _setAttribute: (attributeName, value) ->
+      @emit attributeName, value
+      @[attributeName] = value
 
     destroy: () ->
       if @timerId?
@@ -92,12 +147,6 @@ module.exports = (env) ->
       if @type is value then return
       @type = value
 
-    getPrices: -> Promise.resolve(@prices)
-
-    setPrices: (value) ->
-      @prices = value
-      @emit 'prices', value
-
     reloadPrices: ->
       env.logger.info "reloading prices..."
 
@@ -108,7 +157,8 @@ module.exports = (env) ->
           env.logger.warn "Cannot connect to :" + url
           env.logger.error error.code
           placeholder = "<div class=\"tankerkoenig\">Server not reachable at the moment.</div>"
-          @setPrices(placeholder)
+
+          @_setAttribute "prices", placeholder
 
           return
 
@@ -117,13 +167,19 @@ module.exports = (env) ->
         catch err
           env.logger.warn err
           placeholder = "<div class=\"tankerkoenig\">Error on parsing server response.</div>"
-          @setPrices(placeholder)
+
+          @_setAttribute "prices", placeholder
+
           return
 
         placeholderContent = "<div class=\"tankerkoenig\">"
 
         if data? and data.prices?
           prices = data.prices
+
+          e5Min = 10.0
+          e10Min = 10.0
+          dieselMin = 10.0
 
           for id in @ids.split(',')
             price = prices[id]
@@ -133,14 +189,30 @@ module.exports = (env) ->
 
               if (@type.indexOf('e5') > -1 or @type.indexOf('all') > -1) and price.e5
                 placeholderContent = placeholderContent + '<div class="row"><div class="col-1">Super E5</div><div class="col-2">' + price.e5 + ' EUR</div></div>'
+                if price.e5 < e5Min and price.status
+                  e5Min = price.e5
 
               if (@type.indexOf('e10') > -1 or @type.indexOf('all') > -1) and price.e10
                 placeholderContent = placeholderContent + '<div class="row"><div class="col-1">Super E10</div><div class="col-2">' + price.e10 + ' EUR</div></div>'
+                if price.e10 < e10Min and price.status
+                  e10Min = price.e10
 
               if (@type.indexOf('diesel') > -1 or @type.indexOf('all') > -1) and price.diesel
                 placeholderContent = placeholderContent + '<div class="row"><div class="col-1">Diesel</div><div class="col-2">' + price.diesel + ' EUR</div></div>'
+                if price.diesel < dieselMin and price.status
+                  dieselMin = price.diesel
+
 
               placeholderContent = placeholderContent + '</div><div class="clear">&nbsp;</div>'
+
+          if e5Min < 10.0
+            @_setAttribute "e5Min", e5Min
+
+          if e10Min < 10.0
+            @_setAttribute "e10Min", e10Min
+
+          if dieselMin < 10.0
+            @_setAttribute "dieselMin", dieselMin
 
         else
           if data.message
@@ -150,7 +222,8 @@ module.exports = (env) ->
 
         placeholderContent = placeholderContent + "</div>"
 
-        @setPrices(placeholderContent)
+
+        @_setAttribute "prices", placeholderContent
 
 
     retrieveStationNames: ->
