@@ -23,7 +23,7 @@ There are three configuration parameters
       "class": "TankerkoenigDevice",
       "apiKey": "YOUR-API-KEY",
       "ids": "474e5046-deaf-4f9b-9a32-9797b778f047,4429a7d9-fb2d-4c29-8cfe-2ca90323f9f8,278130b1-e062-4a0f-80cc-19e486b4c024",
-      "interval": "10",
+      "interval": 10,
       "type": "all"
     },
 ```

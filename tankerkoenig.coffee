@@ -47,6 +47,16 @@ module.exports = (env) ->
       dieselMin:
         description: 'the cheapest diesel price'
         type: t.number
+      e5Location:
+        description: 'gas station with the cheapest E5 price'
+        type: t.string
+      e10Location:
+        description: 'gas station with the cheapest E10 price'
+        type: t.string
+      dieselLocation:
+        description: 'gas station with the cheapest Diesel price'
+        type: t.string
+
 
     template: 'tankerkoenig'
 
@@ -93,9 +103,12 @@ module.exports = (env) ->
       @type = @config.type or "all"
       @prices = ""
 
-      @e5_min = lastState?["e5_min"]?.value or -1
-      @e10_min = lastState?["e10_min"]?.value or -1
-      @diesel_min = lastState?["diesel_min"]?.value or -1
+      @e5Min = lastState?["e5Min"]?.value or -1
+      @e10Min = lastState?["e10Min"]?.value or -1
+      @dieselMin = lastState?["dieselMin"]?.value or -1
+      @e5Location = lastState?["e5Location"]?.value or ""
+      @e10Location = lastState?["e10Location"]?.value or ""
+      @dieselLocation = lastState?["dieselLocation"]?.value or ""
 
       if @interval < 5
         reloadInterval = 300000
@@ -183,6 +196,9 @@ module.exports = (env) ->
           e5Min = 10.0
           e10Min = 10.0
           dieselMin = 10.0
+          e5Loc = ""
+          e10Loc = ""
+          dieselLoc = ""
 
           for id in @ids.split(',')
             price = prices[id]
@@ -194,28 +210,37 @@ module.exports = (env) ->
                 placeholderContent = placeholderContent + '<div class="row"><div class="col-1">Super E5</div><div class="col-2">' + price.e5 + ' EUR</div></div>'
                 if price.e5 < e5Min and price.status
                   e5Min = price.e5
+                  e5Loc = stationNames[id]
 
               if (@type.indexOf('e10') > -1 or @type.indexOf('all') > -1) and price.e10
                 placeholderContent = placeholderContent + '<div class="row"><div class="col-1">Super E10</div><div class="col-2">' + price.e10 + ' EUR</div></div>'
                 if price.e10 < e10Min and price.status
                   e10Min = price.e10
+                  e10Loc = stationNames[id]
 
               if (@type.indexOf('diesel') > -1 or @type.indexOf('all') > -1) and price.diesel
                 placeholderContent = placeholderContent + '<div class="row"><div class="col-1">Diesel</div><div class="col-2">' + price.diesel + ' EUR</div></div>'
                 if price.diesel < dieselMin and price.status
                   dieselMin = price.diesel
+                  dieselLoc = stationNames[id]
 
 
               placeholderContent = placeholderContent + '</div><div class="clear">&nbsp;</div>'
 
+
           if e5Min < 10.0
             @_setAttribute "e5Min", e5Min
-
           if e10Min < 10.0
             @_setAttribute "e10Min", e10Min
-
           if dieselMin < 10.0
             @_setAttribute "dieselMin", dieselMin
+          if e5Loc != ""
+            @_setAttribute "e5Location", e5Loc
+          if e10Loc != ""
+            @_setAttribute "e10Location", e10Loc
+          if dieselLoc != ""
+            @_setAttribute "dieselLocation", dieselLoc
+
 
         else
           if data.message

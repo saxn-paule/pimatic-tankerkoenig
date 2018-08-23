@@ -32,7 +32,7 @@ module.exports = {
           properties:
             name:
               enum: [
-                "e5Min", "e10Min", "dieselMin"
+                "e5Min", "e10Min", "dieselMin", "e5Location", "e10Location", "dieselLocation"
               ]
               description: "price attributes"
             label:
