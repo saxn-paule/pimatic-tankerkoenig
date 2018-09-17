@@ -103,9 +103,9 @@ module.exports = (env) ->
       @type = @config.type or "all"
       @prices = ""
 
-      @e5Min = lastState?["e5Min"]?.value or -1
-      @e10Min = lastState?["e10Min"]?.value or -1
-      @dieselMin = lastState?["dieselMin"]?.value or -1
+      @e5Min = lastState?["e5Min"]?.value
+      @e10Min = lastState?["e10Min"]?.value
+      @dieselMin = lastState?["dieselMin"]?.value
       @e5Location = lastState?["e5Location"]?.value or ""
       @e10Location = lastState?["e10Location"]?.value or ""
       @dieselLocation = lastState?["dieselLocation"]?.value or ""
@@ -188,7 +188,15 @@ module.exports = (env) ->
         placeholderContent = "<div class=\"tankerkoenig\">"
 
         updateDate = new Date()
-        placeholderContent = placeholderContent + "<div class='last_update'>Stand: " + updateDate.getHours() + ":" + updateDate.getMinutes() + " Uhr</div>"
+        hours = updateDate.getHours()
+        minutes = updateDate.getUTCMinutes()
+
+        if hours < 10
+          hours = "0" + hours
+        if minutes < 10
+          minutes = "0" + minutes
+
+        placeholderContent = placeholderContent + "<div class='last_update'>Stand: " + hours + ":" + minutes + " Uhr</div>"
 
         if data? and data.prices?
           prices = data.prices
@@ -234,6 +242,7 @@ module.exports = (env) ->
             @_setAttribute "e10Min", e10Min
           if dieselMin < 10.0
             @_setAttribute "dieselMin", dieselMin
+
           if e5Loc != ""
             @_setAttribute "e5Location", e5Loc
           if e10Loc != ""
