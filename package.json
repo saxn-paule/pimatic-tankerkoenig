@@ -10,7 +10,7 @@
 	"device-config-schema.coffee",
     "app"
   ],
-  "version": "0.0.4",
+  "version": "0.10.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/saxn-paule/pimatic-tankerkoenig.git"
@@ -23,10 +23,10 @@
     "request": "2.83.0"
   },
   "peerDependencies": {
-    "pimatic": "0.9.*"
+    "pimatic": "0.10.*"
   },
   "engines": {
-    "node": ">0.8.x",
-    "npm": ">1.1.x"
+    "node": ">8.0.x",
+    "npm": ">6.0.x"
   }
 }

@@ -86,9 +86,11 @@ module.exports = (env) ->
       config.xAttributeOptions = xAttributeOptions
     ###
 
-    constructor: (@config, @plugin, lastState) ->
-      # create getter function for attributes
+    constructor: (config, plugin, lastState) ->
+      super(config.id, config.name)
+      @config = config
 
+      # create getter function for attributes
       for attributeName of @attributes
         do (attributeName) =>
           @_createGetter(attributeName, =>
@@ -122,9 +124,6 @@ module.exports = (env) ->
       @timerId = setInterval ( =>
         @reloadPrices()
       ), reloadInterval
-
-      super()
-
 
     _setAttribute: (attributeName, value) ->
       @emit attributeName, value
